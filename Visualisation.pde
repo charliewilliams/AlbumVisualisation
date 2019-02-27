@@ -30,6 +30,9 @@ float totalLengthMillis;
 float radius;
 
 ArrayList<Song>songs = new ArrayList<Song>();
+PImage img;
+
+PGraphics pg_waveforms;
 
 void setup() {
   size(1024, 1024);
@@ -40,6 +43,8 @@ void setup() {
   ellipseMode(CENTER);
   noLoop();
   smooth(4);
+
+  img = loadImage("waveform.png");
 
   radius = width * 0.3;
   int totalLength = 0;
@@ -66,7 +71,11 @@ void draw() {
   float hueIncr = 90;
   float wrapIncr = 45;
 
+  int idx = 0;
+
   for (Song s : songs) {
+
+    idx++;
 
     // draw a line to demarcate the start of the song
     noFill();
@@ -95,8 +104,6 @@ void draw() {
 
     // put all the notes in the arc as mini-arcs
     noFill();
-    //strokeWeight(0.5);
-    //strokeWeight(1);
 
     for (Float startTime : s.timestamps) {
 
@@ -107,19 +114,19 @@ void draw() {
 
       //stroke(random(255), random(255), random(255));
       float hueRandomness = 30;
-      
+
       //hueAngle = map(n.pitchClass, 0, 11, 0, 360);
       //float hueOffset = map(n.channel, 0, 5, -50, 50) + random(-hueRandomness, hueRandomness);
-      
+
       hueAngle = map(n.channel, 0, 11, 0, 360);
       float hueOffset = map(n.pitchClass, 0, 5, -20, 20) + random(-hueRandomness, hueRandomness);
-      
+
       float satRandomness = 30;
       float sat = map(n.velocity, 0, 1, 20, 100) + random(-satRandomness, satRandomness);
       float briRandomness = 30;
       float bri = map(n.velocity, 0, 1, 20, 100) + random(-briRandomness, briRandomness);
-      
-      stroke(hueAngle + hueOffset, sat, bri, 100);
+
+      stroke(hueAngle + hueOffset, sat, bri, 40);
 
       float rad = map(n.pitch, 0, 1, inner * 0.75, outer * 0.65);
       float notePctThroughSong = (startTime * 1000) / s.lengthMillis;
@@ -138,6 +145,11 @@ void draw() {
       line(notePos.x, notePos.y, noteEnd.x, noteEnd.y);
     }
 
+    if (img == null) {
+      // draw the song's waveform
+      drawWaveform(nf(idx, 2) + ".mp3", startAngle, startAngle + angle);
+    }
+
     // increment startAngle for the next song
     startAngle += angle;
 
@@ -151,6 +163,13 @@ void draw() {
 
     //return; // debug
   }
+
+  if (img != null) {
+    imageMode(CENTER);
+    image(img, 0, 0, width, height);
+  }
+
+  saveFrame("output.jpg");
 }
 
 float angleForSong(Song s) {
