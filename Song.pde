@@ -5,14 +5,21 @@ import java.lang.Object;
 class Song {
 
   String title;
+  String key;
+  int rootPitch;
+  int mode;
   int lengthMillis;
   HashMap<Float, Note> notes;
   Float[] timestamps;
   int noteCount;
 
-  Song(String title, String filename, int lengthSeconds) {
+  Song(String title, String key, int root, int mode, String filename, int lengthSeconds) {
 
     this.title = title;
+    this.key = key;
+    this.rootPitch = root;
+    this.mode = mode;
+    
     notes = loadJSONFile(filename);
     noteCount = notes.size();
     lengthMillis = lengthSeconds * 1000;
@@ -41,10 +48,20 @@ class Song {
 
       JSONObject track = tracks.getJSONObject(i);
 
-      if (track.get("id") == null) {
+      Integer channel;
+
+      if (track.get("id") == null && track.get("name") != null && track.getString("name").length() > 0) {
+        channel = Integer.parseInt(track.getString("name"));
+      } else if (track.get("id") != null) {
+        channel = track.getInt("id");
+      } else {
+        channel = 1;
+      }
+      
+      if (channel == 16) {
         continue;
       }
-      Integer channel = track.getInt("id");
+
       JSONArray notesJSON = track.getJSONArray("notes");
 
       //println(notesJSON.size(), "notes in track", i, "(channel", channel, ")");

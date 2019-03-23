@@ -3,21 +3,16 @@ Minim minim;
 AudioSample sound; 
 
 int stride = 16384;
-PGraphics pg_waveform;
 
-void drawWaveform(String name, float startAngle, float endAngle) {
+void drawWaveform(PGraphics pg_waveform, String name, float startAngle, float endAngle) {
 
   if (minim == null) {
     minim = new Minim(this);
   }
 
-  if (pg_waveform == null) {
-    pg_waveform = createGraphics(width, height);
-  }
-
   float myRad = radius / 2;
 
-  println(name);
+  //println(name);
 
   sound = minim.loadSample(name, 512);
 
@@ -56,14 +51,15 @@ void drawWaveform(String name, float startAngle, float endAngle) {
 
   sound.close();
 
+  pg_waveform.colorMode(HSB, 360, 100, 100, 100);
   // Draw
-  stroke(255);
+  pg_waveform.stroke(255);
   //noFill();
-  fill(200, 20);
-  strokeWeight(0.5);
+  pg_waveform.fill(200, 20);
+  pg_waveform.strokeWeight(0.5);
 
   float gain = 100;
-  PShape shape = createShape();
+  PShape shape = pg_waveform.createShape();
   shape.beginShape();
 
   //shape.vertex(0, 0);
@@ -88,15 +84,8 @@ void drawWaveform(String name, float startAngle, float endAngle) {
 
   shape.endShape(CLOSE);
 
-  pg_waveform.beginDraw();
   pg_waveform.pushMatrix();
   pg_waveform.translate(width/2, height/2);
-  pg_waveform.colorMode(HSB, 360, 100, 100, 100);
   pg_waveform.shape(shape);
   pg_waveform.popMatrix();
-  pg_waveform.endDraw();
-
-  pg_waveform.save("data/waveform.png");
-
-  shape(shape);
 }
